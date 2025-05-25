@@ -12,7 +12,7 @@ class GoogleDriveVideoDownloader:
     """A class to download videos from Google Drive using parallel chunk downloading"""
     
     def __init__(self, chunk_size=8*1024*1024, stream_chunk_size=8192, max_workers=8, 
-                 max_retries=3, retry_delay=2):
+                 max_retries=3, retry_delay=2,default_stream=True):
         """
         Initialize the downloader with configurable parameters
         
@@ -22,6 +22,7 @@ class GoogleDriveVideoDownloader:
             max_workers (int): Maximum number of parallel workers (default: 8)
             max_retries (int): Maximum number of retry attempts (default: 3)
             retry_delay (int): Delay between retries in seconds (default: 2)
+            default_stream (bool): Use the default stream (default: True)
         """
         self.chunk_size = chunk_size
         self.stream_chunk_size = stream_chunk_size
@@ -29,6 +30,7 @@ class GoogleDriveVideoDownloader:
         self.max_retries = max_retries
         self.retry_delay = retry_delay
         self.temp_chunks_dir = 'temp_chunks'
+        self.default_stream = default_stream
         
         # Google Drive API constants
         self.api_key = 'AIzaSyDVQw45DwoYh632gvsP5vPDqEKvb-Ywnb8'
@@ -91,6 +93,10 @@ class GoogleDriveVideoDownloader:
                         
                         resolution = f"{quality}p" if quality > 0 else "unknown"
                         print(f"[{index}] Found {resolution} stream")
+                    
+                    if self.default_stream:
+                        print("[+] Default Highest quailty selected.")
+                        return transcoding[-1].get('url'), video_title
                     
                     choice = input("Enter the index of the stream you want to download: ")
                     try:
